@@ -5,6 +5,7 @@
   "description": "Reprodução simultânea de áudios via Dropbox com controle de volume",
   "action": {
     "title": "SoundMaster",
+    "icon": "/icon.svg",
     "popover": "/",
     "height": 620,
     "width": 520
