@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SoundMaster - Áudio para Owlbear</title>
+    <title>SoundMaster - Áudio para Owlbear (Sincronizado)</title>
     <style>
         * {
             margin: 0;
@@ -34,16 +34,6 @@
             color: #d4af37;
             font-size: 24px;
             margin-bottom: 5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        h1 small {
-            font-size: 12px;
-            color: #888;
-            font-weight: normal;
         }
 
         .sub {
@@ -62,6 +52,17 @@
             border-radius: 20px;
             font-size: 11px;
             margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .player-badge {
+            background: #2a4a2a;
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            margin-bottom: 15px;
+            text-align: center;
         }
 
         .action-bar {
@@ -76,14 +77,11 @@
             background: #3a3a3a;
             border: none;
             color: white;
-            padding: 8px 16px;
+            padding: 10px 20px;
             border-radius: 8px;
             cursor: pointer;
-            font-size: 13px;
+            font-size: 14px;
             transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
         }
 
         .btn-primary {
@@ -113,7 +111,6 @@
         .btn-danger:disabled {
             background: #4a3a3a;
             cursor: not-allowed;
-            opacity: 0.6;
         }
 
         .btn:hover {
@@ -178,7 +175,6 @@
             border-radius: 12px;
             padding: 12px;
             border-left: 4px solid #d4af37;
-            transition: all 0.2s;
             display: flex;
             align-items: flex-start;
             gap: 12px;
@@ -212,29 +208,23 @@
             font-size: 15px;
             color: #d4af37;
             word-break: break-word;
-            flex: 1;
         }
 
         .sound-controls {
             display: flex;
             gap: 6px;
-            align-items: center;
-            flex-wrap: wrap;
         }
 
         .control-btn {
             background: #3a3a3a;
             border: none;
             color: white;
-            width: 32px;
-            height: 32px;
+            width: 36px;
+            height: 36px;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 16px;
             transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
         }
 
         .control-btn.play {
@@ -251,7 +241,6 @@
 
         .control-btn:hover {
             filter: brightness(1.1);
-            transform: scale(1.02);
         }
 
         .volume-control {
@@ -259,13 +248,6 @@
             align-items: center;
             gap: 8px;
             margin-top: 8px;
-            flex-wrap: wrap;
-        }
-
-        .volume-label {
-            font-size: 11px;
-            color: #aaa;
-            width: 35px;
         }
 
         .volume-slider {
@@ -288,9 +270,9 @@
         }
 
         .volume-value {
-            font-size: 10px;
+            font-size: 11px;
             color: #d4af37;
-            min-width: 35px;
+            min-width: 40px;
             text-align: right;
         }
 
@@ -308,43 +290,52 @@
             padding: 40px;
         }
 
-        .sounds-list::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .sounds-list::-webkit-scrollbar-track {
-            background: #1a1a1a;
-            border-radius: 10px;
-        }
-
-        .sounds-list::-webkit-scrollbar-thumb {
-            background: #5d4723;
-            border-radius: 10px;
-        }
-
         .delete-bar {
             margin-bottom: 15px;
             display: flex;
             justify-content: flex-end;
         }
+
+        .status-info {
+            font-size: 11px;
+            color: #888;
+            text-align: center;
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px solid #444;
+        }
+
+        .sync-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #2a5a2a;
+            margin-right: 6px;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.4; }
+            50% { opacity: 1; }
+            100% { opacity: 0.4; }
+        }
     </style>
 </head>
 <body>
 <div class="container">
-    <h1>
-        🎵 SoundMaster 
-        <small>para Owlbear Rodeo</small>
-    </h1>
-    <div class="sub">Reprodução simultânea de áudios via Dropbox</div>
+    <h1>🎵 SoundMaster</h1>
+    <div class="sub">Reprodução simultânea de áudios sincronizada</div>
 
-    <div id="gmControls" style="display: none;">
-        <div style="text-align: center; margin-bottom: 15px;">
-            <span class="gm-badge">👑 Modo Mestre</span>
-        </div>
+    <div id="rolePanel" style="text-align: center; margin-bottom: 15px;">
+        <span id="roleBadge" class="gm-badge">⏳ Conectando...</span>
+    </div>
+
+    <div id="masterPanel" style="display: none;">
         <div class="action-bar">
             <button class="btn btn-primary" id="btnAddSound">➕ Adicionar Som</button>
-            <button class="btn btn-success" id="btnExportList">💾 Exportar Lista</button>
-            <button class="btn" id="btnImportList">📂 Importar Lista</button>
+            <button class="btn btn-success" id="btnExportList">💾 Exportar</button>
+            <button class="btn" id="btnImportList">📂 Importar</button>
             <input type="file" id="importFileInput" accept=".json" style="display: none;">
         </div>
         <div class="delete-bar">
@@ -352,21 +343,22 @@
         </div>
     </div>
 
-    <div id="playerMode" style="display: none; text-align: center; margin-bottom: 15px;">
-        <span class="gm-badge" style="background: #2a4a2a;">🎧 Modo Jogador</span>
-    </div>
-
     <div id="soundsContainer" class="sounds-list">
         <div class="no-sounds">📢 Nenhum som disponível.</div>
     </div>
+
+    <div class="status-info">
+        <span class="sync-indicator"></span>
+        <span id="syncStatus">Sincronizado via Firebase</span>
+    </div>
 </div>
 
-<!-- Modal de adicionar som -->
+<!-- Modal -->
 <div id="soundModal" class="modal">
     <div class="modal-content">
-        <h3>➕ Adicionar Novo Som</h3>
-        <input type="text" id="soundName" placeholder="Nome do som (ex: Trovão, Música de Batalha...)" autocomplete="off">
-        <input type="text" id="soundUrl" placeholder="URL do Dropbox (link compartilhável)" autocomplete="off">
+        <h3>➕ Adicionar Som</h3>
+        <input type="text" id="soundName" placeholder="Nome do som">
+        <input type="text" id="soundUrl" placeholder="URL do Dropbox ou arquivo .mp3">
         <div class="modal-buttons">
             <button class="btn" id="btnCancelModal">Cancelar</button>
             <button class="btn btn-primary" id="btnConfirmModal">Adicionar</button>
@@ -375,19 +367,38 @@
 </div>
 
 <script type="module">
-    import OBR from "@owlbear-rodeo/sdk";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+    import { getDatabase, ref, onValue, set, push, update, onDisconnect, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js";
+    
+    const firebaseConfig = {
+        apiKey: "AIzaSyDLzqmIVK3AyExjc4hr6Jht4tLUnbHkCoE",
+        authDomain: "mestragem-3det-alpha.firebaseapp.com",
+        databaseURL: "https://mestragem-3det-alpha-default-rtdb.firebaseio.com",
+        projectId: "mestragem-3det-alpha",
+        storageBucket: "mestragem-3det-alpha.firebasestorage.app",
+        messagingSenderId: "290185604308",
+        appId: "1:290185604308:web:4d9ab0d246569a72629f41",
+        measurementId: "G-PRJZGM2E1G"
+    };
 
+    let app = initializeApp(firebaseConfig);
+    let db = getDatabase(app);
+    
     // =========================================
-    // VARIÁVEIS GLOBAIS
+    // VARIÁVEIS
     // =========================================
     let isGM = false;
-    let audioElements = {};
+    let roomId = null;
+    let userId = null;
     let sounds = [];
-    let currentPlayerId = null;
-
+    let audioElements = {};
+    let syncTimeout = null;
+    
+    // Elementos
     const soundsContainer = document.getElementById('soundsContainer');
-    const gmControls = document.getElementById('gmControls');
-    const playerMode = document.getElementById('playerMode');
+    const masterPanel = document.getElementById('masterPanel');
+    const roleBadge = document.getElementById('roleBadge');
+    const syncStatusSpan = document.getElementById('syncStatus');
     const btnAddSound = document.getElementById('btnAddSound');
     const btnExportList = document.getElementById('btnExportList');
     const btnImportList = document.getElementById('btnImportList');
@@ -400,268 +411,292 @@
     const soundUrlInput = document.getElementById('soundUrl');
 
     // =========================================
-    // FUNÇÕES DE ÁUDIO
+    // FUNÇÕES DE SINCRONIZAÇÃO
     // =========================================
-    function createAudioElement(sound) {
-        const audio = new Audio();
-        audio.src = sound.url;
-        audio.loop = false;
-        audio.preload = 'auto';
-        audio.volume = (sound.volume !== undefined) ? sound.volume : 0.7;
-        
-        if (sound.currentTime && sound.currentTime > 0) {
-            audio.currentTime = sound.currentTime;
+    
+    function gerarRoomId() {
+        // Tentar obter da URL ou criar um fixo para testes
+        const urlParams = new URLSearchParams(window.location.search);
+        let room = urlParams.get('room');
+        if (!room) {
+            room = localStorage.getItem('soundmaster_room');
         }
-        
-        audio.onended = () => {
-            const s = sounds.find(item => item.id === sound.id);
-            if (s) {
-                s.playing = false;
-                updateSoundUI(sound.id);
-                saveToStorage();
-            }
-        };
-        
-        return audio;
+        if (!room) {
+            room = 'sala_' + Math.random().toString(36).substr(2, 8);
+            localStorage.setItem('soundmaster_room', room);
+        }
+        return room;
     }
-
-    function setVolume(soundId, volume) {
-        const sound = sounds.find(s => s.id === soundId);
+    
+    function gerarUserId() {
+        let id = localStorage.getItem('soundmaster_userId');
+        if (!id) {
+            id = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+            localStorage.setItem('soundmaster_userId', id);
+        }
+        return id;
+    }
+    
+    function sincronizarSounds() {
+        if (!roomId) return;
+        if (syncTimeout) clearTimeout(syncTimeout);
+        syncTimeout = setTimeout(() => {
+            const soundsRef = ref(db, `soundmaster/${roomId}/sounds`);
+            const dataToSave = sounds.map(s => ({
+                id: s.id,
+                nome: s.nome,
+                url: s.url,
+                volume: s.volume,
+                playing: s.playing,
+                currentTime: s.currentTime
+            }));
+            set(soundsRef, dataToSave).catch(console.warn);
+        }, 500);
+    }
+    
+    function enviarComando(comando, soundId, valor) {
+        if (!roomId || !isGM) return;
+        
+        const comandoRef = ref(db, `soundmaster/${roomId}/comandos`);
+        push(comandoRef, {
+            tipo: comando,
+            soundId: soundId,
+            valor: valor,
+            enviadoPor: userId,
+            timestamp: Date.now()
+        }).catch(console.warn);
+    }
+    
+    function processarComando(comando) {
+        if (isGM) return; // Mestre já processa localmente
+        
+        switch(comando.tipo) {
+            case 'play':
+                playSoundSync(comando.soundId);
+                break;
+            case 'pause':
+                pauseSoundSync(comando.soundId);
+                break;
+            case 'stop':
+                stopSoundSync(comando.soundId);
+                break;
+            case 'volume':
+                setVolumeSync(comando.soundId, comando.valor);
+                break;
+            case 'seek':
+                seekSoundSync(comando.soundId, comando.valor);
+                break;
+        }
+    }
+    
+    function playSoundSync(id) {
+        const sound = sounds.find(s => s.id === id);
         if (!sound) return;
         
-        const vol = Math.min(1, Math.max(0, volume));
-        sound.volume = vol;
-        
-        const audio = audioElements[soundId];
-        if (audio) {
-            audio.volume = vol;
-        }
-        
-        updateVolumeUI(soundId);
-        saveToStorage();
-    }
-
-    function playSound(soundId) {
-        const sound = sounds.find(s => s.id === soundId);
-        if (!sound) return;
-        
-        let audio = audioElements[soundId];
+        let audio = audioElements[id];
         if (!audio) {
-            audio = createAudioElement(sound);
-            audioElements[soundId] = audio;
+            audio = new Audio(sound.url);
+            audio.volume = sound.volume || 0.7;
+            audio.onended = () => {
+                const s = sounds.find(s2 => s2.id === id);
+                if (s) {
+                    s.playing = false;
+                    renderizar();
+                }
+            };
+            audioElements[id] = audio;
         }
         
-        audio.play().catch(e => console.warn("Erro ao reproduzir:", e));
+        audio.currentTime = sound.currentTime || 0;
+        audio.play().catch(e => console.warn('Erro ao reproduzir:', e));
         sound.playing = true;
-        updateSoundUI(soundId);
-        saveToStorage();
+        renderizar();
     }
-
-    function pauseSound(soundId) {
-        const audio = audioElements[soundId];
+    
+    function pauseSoundSync(id) {
+        const sound = sounds.find(s => s.id === id);
+        if (!sound) return;
+        
+        const audio = audioElements[id];
         if (audio) {
             audio.pause();
-            const sound = sounds.find(s => s.id === soundId);
-            if (sound) {
-                sound.currentTime = audio.currentTime;
-                sound.playing = false;
-            }
-        } else {
-            const sound = sounds.find(s => s.id === soundId);
-            if (sound) {
-                sound.playing = false;
-            }
+            sound.currentTime = audio.currentTime;
         }
-        updateSoundUI(soundId);
-        saveToStorage();
+        sound.playing = false;
+        renderizar();
     }
-
-    function stopSound(soundId) {
-        const audio = audioElements[soundId];
+    
+    function stopSoundSync(id) {
+        const sound = sounds.find(s => s.id === id);
+        if (!sound) return;
+        
+        const audio = audioElements[id];
         if (audio) {
             audio.pause();
             audio.currentTime = 0;
-            const sound = sounds.find(s => s.id === soundId);
-            if (sound) {
-                sound.currentTime = 0;
-                sound.playing = false;
-            }
-        } else {
-            const sound = sounds.find(s => s.id === soundId);
-            if (sound) {
-                sound.currentTime = 0;
-                sound.playing = false;
-            }
         }
-        updateSoundUI(soundId);
-        saveToStorage();
+        sound.currentTime = 0;
+        sound.playing = false;
+        renderizar();
     }
-
-    function togglePlay(soundId) {
-        const sound = sounds.find(s => s.id === soundId);
-        if (!sound) return;
+    
+    function setVolumeSync(id, volume) {
+        const sound = sounds.find(s => s.id === id);
+        if (sound) sound.volume = volume;
         
-        if (sound.playing) {
-            stopSound(soundId);
-        } else {
-            playSound(soundId);
-        }
+        const audio = audioElements[id];
+        if (audio) audio.volume = volume;
+        
+        renderizar();
     }
-
-    function removeSounds(soundIds) {
-        soundIds.forEach(soundId => {
-            const audio = audioElements[soundId];
-            if (audio) {
-                audio.pause();
-                audio.src = '';
-                delete audioElements[soundId];
+    
+    function seekSoundSync(id, time) {
+        const sound = sounds.find(s => s.id === id);
+        if (sound) sound.currentTime = time;
+        
+        const audio = audioElements[id];
+        if (audio && audio.playing) {
+            audio.currentTime = time;
+        }
+        renderizar();
+    }
+    
+    function escutarComandos() {
+        if (!roomId) return;
+        
+        const comandosRef = ref(db, `soundmaster/${roomId}/comandos`);
+        onValue(comandosRef, (snapshot) => {
+            const comandos = snapshot.val();
+            if (!comandos) return;
+            
+            const comandosList = Object.values(comandos);
+            const ultimoComando = comandosList[comandosList.length - 1];
+            
+            if (ultimoComando && ultimoComando.enviadoPor !== userId) {
+                processarComando(ultimoComando);
+            }
+            
+            // Limpar comandos antigos (manter apenas os últimos 20)
+            const keys = Object.keys(comandos);
+            if (keys.length > 20) {
+                const toRemove = keys.slice(0, keys.length - 20);
+                toRemove.forEach(key => {
+                    set(ref(db, `soundmaster/${roomId}/comandos/${key}`), null);
+                });
             }
         });
-        sounds = sounds.filter(s => !soundIds.includes(s.id));
-        renderSounds();
-        saveToStorage();
-        updateDeleteButtonState();
     }
-
-    function updateSoundUI(soundId) {
-        const card = document.querySelector(`.sound-card[data-id="${soundId}"]`);
-        if (!card) return;
+    
+    function escutarSounds() {
+        if (!roomId) return;
         
-        const sound = sounds.find(s => s.id === soundId);
-        if (sound) {
-            const playBtn = card.querySelector('.play-btn');
-            if (playBtn) {
-                if (sound.playing) {
-                    playBtn.textContent = '⏹️';
-                    playBtn.classList.add('playing');
-                } else {
-                    playBtn.textContent = '▶️';
-                    playBtn.classList.remove('playing');
-                }
+        const soundsRef = ref(db, `soundmaster/${roomId}/sounds`);
+        onValue(soundsRef, (snapshot) => {
+            const data = snapshot.val();
+            if (!data) return;
+            
+            // Só atualiza se não for o mestre (mestre já tem os dados locais)
+            if (!isGM) {
+                sounds = data.map(s => ({
+                    ...s,
+                    playing: false,
+                    currentTime: s.currentTime || 0
+                }));
+                renderizar();
             }
-        }
+        });
     }
-
-    function updateVolumeUI(soundId) {
-        const card = document.querySelector(`.sound-card[data-id="${soundId}"]`);
-        if (!card) return;
-        
-        const sound = sounds.find(s => s.id === soundId);
-        if (sound) {
-            const slider = card.querySelector('.volume-slider');
-            const valueSpan = card.querySelector('.volume-value');
-            if (slider) slider.value = sound.volume;
-            if (valueSpan) valueSpan.textContent = Math.round(sound.volume * 100);
-        }
-    }
-
-    function updateDeleteButtonState() {
-        if (!btnDeleteSelected) return;
-        const checkedBoxes = document.querySelectorAll('.sound-checkbox input:checked');
-        btnDeleteSelected.disabled = checkedBoxes.length === 0;
-    }
-
+    
     // =========================================
-    // RENDERIZAÇÃO
+    // FUNÇÕES DE ÁUDIO (COM ENVIO DE COMANDOS)
     // =========================================
-    function renderSounds() {
-        if (!soundsContainer) return;
-        
+    function renderizar() {
         if (sounds.length === 0) {
             soundsContainer.innerHTML = '<div class="no-sounds">📢 Nenhum som disponível.</div>';
-            updateDeleteButtonState();
+            if (btnDeleteSelected) btnDeleteSelected.disabled = true;
             return;
         }
-        
-        soundsContainer.innerHTML = '';
-        sounds.forEach(sound => {
-            const card = document.createElement('div');
-            card.className = 'sound-card';
-            card.setAttribute('data-id', sound.id);
+
+        let html = '';
+        for (let i = 0; i < sounds.length; i++) {
+            const s = sounds[i];
+            const playBtnClass = s.playing ? 'play playing' : 'play';
+            const playBtnText = s.playing ? '⏹️' : '▶️';
+            const volumePercent = Math.round((s.volume || 0.7) * 100);
             
-            const playBtnText = sound.playing ? '⏹️' : '▶️';
-            const playBtnClass = sound.playing ? 'play-btn playing' : 'play-btn';
-            const volumePercent = Math.round((sound.volume !== undefined ? sound.volume : 0.7) * 100);
-            
-            card.innerHTML = `
-                <div class="sound-checkbox">
-                    <input type="checkbox" data-id="${sound.id}" class="sound-select">
-                </div>
-                <div class="sound-content">
-                    <div class="sound-header">
-                        <div class="sound-name">${escapeHtml(sound.nome)}</div>
-                        <div class="sound-controls">
-                            <button class="control-btn ${playBtnClass}" data-action="play" data-id="${sound.id}">${playBtnText}</button>
-                            <button class="control-btn pause" data-action="pause" data-id="${sound.id}">⏸️</button>
+            html += `
+                <div class="sound-card" data-id="${s.id}">
+                    ${isGM ? `
+                        <div class="sound-checkbox">
+                            <input type="checkbox" class="sound-select" data-id="${s.id}">
                         </div>
+                    ` : ''}
+                    <div class="sound-content">
+                        <div class="sound-header">
+                            <div class="sound-name">${escapeHtml(s.nome)}</div>
+                            <div class="sound-controls">
+                                <button class="control-btn ${playBtnClass}" data-action="play" data-id="${s.id}">${playBtnText}</button>
+                                <button class="control-btn pause" data-action="pause" data-id="${s.id}">⏸️</button>
+                            </div>
+                        </div>
+                        <div class="volume-control">
+                            <span>🔊</span>
+                            <input type="range" class="volume-slider" min="0" max="1" step="0.01" value="${s.volume || 0.7}" data-action="volume" data-id="${s.id}">
+                            <span class="volume-value">${volumePercent}%</span>
+                        </div>
+                        <div class="sound-url">${escapeHtml(s.url.length > 60 ? s.url.substring(0, 60) + '...' : s.url)}</div>
                     </div>
-                    <div class="volume-control">
-                        <span class="volume-label">🔊 Vol</span>
-                        <input type="range" class="volume-slider" min="0" max="1" step="0.01" value="${sound.volume !== undefined ? sound.volume : 0.7}" data-action="volume" data-id="${sound.id}">
-                        <span class="volume-value">${volumePercent}%</span>
-                    </div>
-                    <div class="sound-url">${escapeHtml(sound.url)}</div>
                 </div>
             `;
-            soundsContainer.appendChild(card);
-        });
+        }
+        soundsContainer.innerHTML = html;
         
-        // Event listeners
+        // Conectar eventos
         document.querySelectorAll('[data-action="play"]').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const id = btn.getAttribute('data-id');
-                togglePlay(id);
-            });
+            btn.onclick = () => togglePlay(btn.getAttribute('data-id'));
         });
         
         document.querySelectorAll('[data-action="pause"]').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const id = btn.getAttribute('data-id');
-                pauseSound(id);
-            });
+            btn.onclick = () => pauseSound(btn.getAttribute('data-id'));
         });
         
         document.querySelectorAll('[data-action="volume"]').forEach(slider => {
-            slider.addEventListener('input', (e) => {
-                e.stopPropagation();
+            slider.oninput = (e) => {
                 const id = slider.getAttribute('data-id');
                 const value = parseFloat(slider.value);
-                const volumeSpan = slider.closest('.sound-card')?.querySelector('.volume-value');
-                if (volumeSpan) volumeSpan.textContent = Math.round(value * 100);
+                const volSpan = slider.parentElement.querySelector('.volume-value');
+                if (volSpan) volSpan.textContent = Math.round(value * 100) + '%';
                 setVolume(id, value);
-            });
+            };
         });
         
-        document.querySelectorAll('.sound-select').forEach(checkbox => {
-            checkbox.addEventListener('change', () => {
-                updateDeleteButtonState();
+        if (isGM) {
+            document.querySelectorAll('.sound-select').forEach(cb => {
+                cb.onchange = () => atualizarBotaoExcluir();
             });
-        });
-        
-        updateDeleteButtonState();
+            atualizarBotaoExcluir();
+        }
     }
-
-    // =========================================
-    // CRUD
-    // =========================================
+    
+    function atualizarBotaoExcluir() {
+        const selecionados = document.querySelectorAll('.sound-select:checked').length;
+        btnDeleteSelected.disabled = selecionados === 0;
+    }
+    
     function addSound(nome, url) {
         if (!nome.trim() || !url.trim()) {
-            alert('Preencha o nome e a URL do som!');
+            alert('Preencha o nome e a URL!');
             return false;
         }
         
         let finalUrl = url;
         if (url.includes('dropbox.com') && !url.includes('dl.dropboxusercontent.com')) {
             finalUrl = url.replace('www.dropbox.com', 'dl.dropboxusercontent.com').replace('?dl=0', '');
-            if (!finalUrl.includes('?dl=1')) {
-                finalUrl += '?dl=1';
-            }
+            if (!finalUrl.includes('?dl=1')) finalUrl += '?dl=1';
         }
         
         const newSound = {
-            id: Date.now().toString() + '_' + Math.random().toString(36).substr(2, 6),
+            id: Date.now() + '_' + Math.random().toString(36).substr(2, 6),
             nome: nome.trim(),
             url: finalUrl,
             playing: false,
@@ -670,175 +705,160 @@
         };
         
         sounds.push(newSound);
-        renderSounds();
-        saveToStorage();
+        renderizar();
+        sincronizarSounds();
         return true;
     }
     
-    function deleteSelectedSounds() {
+    function deleteSelected() {
         const selectedIds = [];
-        document.querySelectorAll('.sound-select:checked').forEach(checkbox => {
-            selectedIds.push(checkbox.getAttribute('data-id'));
+        document.querySelectorAll('.sound-select:checked').forEach(cb => {
+            selectedIds.push(cb.getAttribute('data-id'));
         });
         
         if (selectedIds.length === 0) return;
         
-        if (confirm(`Tem certeza que deseja excluir ${selectedIds.length} som(ns) selecionado(s)?`)) {
-            removeSounds(selectedIds);
+        if (confirm(`Excluir ${selectedIds.length} som(ns)?`)) {
+            selectedIds.forEach(id => {
+                if (audioElements[id]) {
+                    audioElements[id].pause();
+                    audioElements[id].src = '';
+                    delete audioElements[id];
+                }
+            });
+            sounds = sounds.filter(s => !selectedIds.includes(s.id));
+            renderizar();
+            sincronizarSounds();
         }
     }
     
-    function exportSounds() {
-        const exportData = sounds.map(s => ({
-            nome: s.nome,
-            url: s.url,
-            volume: s.volume !== undefined ? s.volume : 0.7
-        }));
-        const dataStr = JSON.stringify(exportData, null, 2);
-        const blob = new Blob([dataStr], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `soundmaster_playlist_${new Date().toISOString().slice(0,19)}.json`;
-        a.click();
-        URL.revokeObjectURL(url);
+    function togglePlay(id) {
+        const sound = sounds.find(s => s.id === id);
+        if (!sound) return;
+        
+        if (sound.playing) {
+            stopSound(id);
+        } else {
+            playSound(id);
+        }
     }
     
-    function importSoundsFromFile(file) {
+    function playSound(id) {
+        const sound = sounds.find(s => s.id === id);
+        if (!sound) return;
+        
+        let audio = audioElements[id];
+        if (!audio) {
+            audio = new Audio(sound.url);
+            audio.volume = sound.volume || 0.7;
+            audio.onended = () => {
+                const s = sounds.find(s2 => s2.id === id);
+                if (s) {
+                    s.playing = false;
+                    renderizar();
+                    sincronizarSounds();
+                }
+            };
+            audioElements[id] = audio;
+        }
+        
+        audio.currentTime = sound.currentTime || 0;
+        audio.play().catch(e => console.warn('Erro ao reproduzir:', e));
+        sound.playing = true;
+        renderizar();
+        sincronizarSounds();
+        
+        // Enviar comando para os jogadores
+        enviarComando('play', id, null);
+    }
+    
+    function pauseSound(id) {
+        const sound = sounds.find(s => s.id === id);
+        if (!sound) return;
+        
+        const audio = audioElements[id];
+        if (audio) {
+            audio.pause();
+            sound.currentTime = audio.currentTime;
+        }
+        sound.playing = false;
+        renderizar();
+        sincronizarSounds();
+        
+        enviarComando('pause', id, null);
+    }
+    
+    function stopSound(id) {
+        const sound = sounds.find(s => s.id === id);
+        if (!sound) return;
+        
+        const audio = audioElements[id];
+        if (audio) {
+            audio.pause();
+            audio.currentTime = 0;
+        }
+        sound.currentTime = 0;
+        sound.playing = false;
+        renderizar();
+        sincronizarSounds();
+        
+        enviarComando('stop', id, null);
+    }
+    
+    function setVolume(id, volume) {
+        const sound = sounds.find(s => s.id === id);
+        if (sound) sound.volume = volume;
+        
+        const audio = audioElements[id];
+        if (audio) audio.volume = volume;
+        
+        sincronizarSounds();
+        enviarComando('volume', id, volume);
+    }
+    
+    function exportar() {
+        const data = sounds.map(s => ({
+            nome: s.nome,
+            url: s.url,
+            volume: s.volume || 0.7
+        }));
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `soundmaster_${new Date().toISOString().slice(0,19)}.json`;
+        a.click();
+        URL.revokeObjectURL(a.href);
+    }
+    
+    function importar(file) {
         const reader = new FileReader();
         reader.onload = (e) => {
             try {
                 const imported = JSON.parse(e.target.result);
                 if (Array.isArray(imported)) {
-                    let count = 0;
                     imported.forEach(item => {
                         if (item.nome && item.url) {
                             sounds.push({
-                                id: Date.now().toString() + '_' + Math.random().toString(36).substr(2, 6) + '_' + count,
+                                id: Date.now() + '_' + Math.random().toString(36).substr(2, 6),
                                 nome: item.nome,
                                 url: item.url,
                                 playing: false,
                                 currentTime: 0,
-                                volume: item.volume !== undefined ? item.volume : 0.7
+                                volume: item.volume || 0.7
                             });
-                            count++;
                         }
                     });
-                    renderSounds();
-                    saveToStorage();
-                    alert(`Importados ${count} sons!`);
+                    renderizar();
+                    sincronizarSounds();
+                    alert(`Importados ${imported.length} sons!`);
                 } else {
-                    alert('Arquivo inválido: não é uma lista de sons.');
+                    alert('Arquivo inválido: formato incorreto.');
                 }
             } catch(err) {
-                alert('Erro ao ler o arquivo: ' + err.message);
+                alert('Erro ao importar: ' + err.message);
             }
         };
         reader.readAsText(file);
-    }
-    
-    // =========================================
-    // PERSISTÊNCIA
-    // =========================================
-    async function saveToStorage() {
-        if (!currentPlayerId) return;
-        
-        const dataToSave = sounds.map(s => ({
-            id: s.id,
-            nome: s.nome,
-            url: s.url,
-            playing: false,
-            currentTime: 0,
-            volume: s.volume !== undefined ? s.volume : 0.7
-        }));
-        
-        try {
-            await OBR.room.setStorage({ sounds: dataToSave });
-        } catch(e) {
-            console.warn("Erro ao salvar:", e);
-        }
-    }
-    
-    async function loadFromStorage() {
-        try {
-            const storage = await OBR.room.getStorage();
-            if (storage.sounds && Array.isArray(storage.sounds)) {
-                sounds = storage.sounds.map(s => ({
-                    ...s,
-                    playing: false,
-                    currentTime: 0
-                }));
-            } else {
-                sounds = [];
-            }
-            renderSounds();
-        } catch(e) {
-            console.warn("Erro ao carregar:", e);
-            sounds = [];
-            renderSounds();
-        }
-    }
-    
-    // =========================================
-    // INICIALIZAÇÃO
-    // =========================================
-    async function init() {
-        await OBR.onReady();
-        
-        const role = await OBR.room.getRole();
-        isGM = (role === "HOST");
-        const player = await OBR.player.get();
-        currentPlayerId = player.id;
-        
-        if (isGM) {
-            gmControls.style.display = 'block';
-            playerMode.style.display = 'none';
-        } else {
-            gmControls.style.display = 'none';
-            playerMode.style.display = 'block';
-        }
-        
-        await loadFromStorage();
-        
-        if (isGM) {
-            btnAddSound.addEventListener('click', () => {
-                soundNameInput.value = '';
-                soundUrlInput.value = '';
-                soundModal.style.display = 'flex';
-            });
-            
-            btnDeleteSelected.addEventListener('click', deleteSelectedSounds);
-            
-            btnCancelModal.addEventListener('click', () => {
-                soundModal.style.display = 'none';
-            });
-            
-            btnConfirmModal.addEventListener('click', () => {
-                const nome = soundNameInput.value.trim();
-                const url = soundUrlInput.value.trim();
-                if (addSound(nome, url)) {
-                    soundModal.style.display = 'none';
-                }
-            });
-            
-            btnExportList.addEventListener('click', exportSounds);
-            btnImportList.addEventListener('click', () => {
-                importFileInput.click();
-            });
-            
-            importFileInput.addEventListener('change', (e) => {
-                if (e.target.files && e.target.files[0]) {
-                    importSoundsFromFile(e.target.files[0]);
-                    importFileInput.value = '';
-                }
-            });
-            
-            soundModal.addEventListener('click', (e) => {
-                if (e.target === soundModal) {
-                    soundModal.style.display = 'none';
-                }
-            });
-        }
     }
     
     function escapeHtml(str) {
@@ -851,7 +871,150 @@
         });
     }
     
-    init();
+    // =========================================
+    // CONEXÃO COM OWLBear
+    // =========================================
+    async function conectarOwlbear() {
+        roomId = gerarRoomId();
+        userId = gerarUserId();
+        
+        syncStatusSpan.textContent = `Sala: ${roomId.substring(0, 15)}...`;
+        
+        if (typeof OBR !== 'undefined') {
+            try {
+                await OBR.onReady();
+                const role = await OBR.room.getRole();
+                isGM = (role === "HOST");
+                
+                if (isGM) {
+                    roleBadge.className = 'gm-badge';
+                    roleBadge.innerHTML = '👑 Modo Mestre (Sincronizado)';
+                    masterPanel.style.display = 'block';
+                } else {
+                    roleBadge.className = 'player-badge';
+                    roleBadge.innerHTML = '🎧 Modo Jogador (Sincronizado)';
+                    masterPanel.style.display = 'none';
+                }
+                
+                // Registrar presença
+                const presenceRef = ref(db, `soundmaster/${roomId}/usuarios/${userId}`);
+                set(presenceRef, {
+                    nome: isGM ? 'Mestre' : 'Jogador',
+                    online: true,
+                    ultimaAtividade: serverTimestamp()
+                });
+                onDisconnect(presenceRef).update({ online: false, ultimaAtividade: serverTimestamp() });
+                
+                console.log('SoundMaster conectado ao Owlbear - GM:', isGM);
+            } catch(err) {
+                console.warn('Erro ao conectar OBR:', err);
+                iniciarModoOffline();
+            }
+        } else {
+            console.log('SDK do Owlbear não detectado');
+            iniciarModoOffline();
+        }
+        
+        // Iniciar listeners
+        escutarSounds();
+        escutarComandos();
+    }
+    
+    function iniciarModoOffline() {
+        isGM = true;
+        roleBadge.className = 'gm-badge';
+        roleBadge.innerHTML = '👑 Modo Mestre (Offline)';
+        masterPanel.style.display = 'block';
+        syncStatusSpan.innerHTML = '⚠️ Modo offline - sem sincronização';
+        
+        // Carregar dados do localStorage
+        try {
+            const saved = localStorage.getItem('soundmaster_sounds');
+            if (saved) {
+                sounds = JSON.parse(saved).map(s => ({
+                    ...s,
+                    playing: false,
+                    currentTime: 0
+                }));
+                renderizar();
+            }
+        } catch(e) {}
+    }
+    
+    function salvarLocal() {
+        if (!roomId) return;
+        try {
+            localStorage.setItem('soundmaster_sounds', JSON.stringify(sounds.map(s => ({
+                id: s.id,
+                nome: s.nome,
+                url: s.url,
+                volume: s.volume
+            }))));
+        } catch(e) {}
+    }
+    
+    // =========================================
+    // EVENTOS DA UI
+    // =========================================
+    function configurarEventos() {
+        if (btnAddSound) {
+            btnAddSound.onclick = () => {
+                soundNameInput.value = '';
+                soundUrlInput.value = '';
+                soundModal.style.display = 'flex';
+            };
+        }
+        
+        if (btnCancelModal) {
+            btnCancelModal.onclick = () => {
+                soundModal.style.display = 'none';
+            };
+        }
+        
+        if (btnConfirmModal) {
+            btnConfirmModal.onclick = () => {
+                const nome = soundNameInput.value.trim();
+                const url = soundUrlInput.value.trim();
+                if (addSound(nome, url)) {
+                    soundModal.style.display = 'none';
+                }
+            };
+        }
+        
+        if (btnExportList) {
+            btnExportList.onclick = exportar;
+        }
+        
+        if (btnImportList) {
+            btnImportList.onclick = () => importFileInput.click();
+        }
+        
+        if (btnDeleteSelected) {
+            btnDeleteSelected.onclick = deleteSelected;
+        }
+        
+        if (importFileInput) {
+            importFileInput.onchange = (e) => {
+                if (e.target.files && e.target.files[0]) {
+                    importar(e.target.files[0]);
+                    importFileInput.value = '';
+                }
+            };
+        }
+        
+        if (soundModal) {
+            soundModal.onclick = (e) => {
+                if (e.target === soundModal) soundModal.style.display = 'none';
+            };
+        }
+    }
+    
+    // Iniciar
+    configurarEventos();
+    conectarOwlbear();
+    
+    // Salvar local periódicamente
+    setInterval(salvarLocal, 30000);
 </script>
 </body>
 </html>
